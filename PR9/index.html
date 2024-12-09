@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Objetos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1 class="display-5 text-primary">Gestión de Objetos</h1>
+            <p class="text-muted">Gestiona tus objetos con facilidad: alta, baja, consulta, modificación e informe.</p>
+        </div>
+
+        
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Alta de Objeto</h5>
+            </div>
+            <div class="card-body">
+                <form id="altaForm">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Objeto</label>
+                        <input type="text" id="nombre" class="form-control" placeholder="Ingrese nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea id="descripcion" class="form-control" placeholder="Ingrese descripción" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Dar de Alta</button>
+                </form>
+            </div>
+        </div>
+
+        
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Consulta y Modificación de Objeto</h5>
+            </div>
+            <div class="card-body">
+                <form id="consultaForm">
+                    <div class="mb-3">
+                        <label for="consultaNombre" class="form-label">Nombre del Objeto</label>
+                        <input type="text" id="consultaNombre" class="form-control" placeholder="Nombre para buscar" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-info" onclick="consultarObjeto()">Consultar</button>
+                        <button type="button" class="btn btn-warning" onclick="modificarObjeto()">Modificar</button>
+                        <button type="button" class="btn btn-danger" onclick="bajaObjeto()">Dar de Baja</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+       
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Informe de Todos los Objetos</h5>
+            </div>
+            <div class="card-body">
+               
+                <div class="mb-3">
+                    <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por descripción..." oninput="filtrarInforme()">
+                </div>
+                <button type="button" class="btn btn-dark w-100" onclick="generarInforme()">Generar Informe</button>
+                <ul id="informeLista" class="list-group list-group-flush mt-3"></ul>
+            </div>
+        </div>
+    </div>
+
+   
+    <script>
+        let objetos = [];
+
+        
+        document.getElementById('altaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const descripcion = document.getElementById('descripcion').value;
+            objetos.push({ nombre, descripcion });
+            alert("Objeto dado de alta con éxito");
+            this.reset();
+            generarInforme();
+        });
+
+        
+        function consultarObjeto() {
+            const nombre = document.getElementById('consultaNombre').value;
+            const objeto = objetos.find(obj => obj.nombre === nombre);
+            if (objeto) {
+                alert(`Descripción: ${objeto.descripcion}`);
+            } else {
+                alert("Objeto no encontrado");
+            }
+        }
+
+        
+        function modificarObjeto() {
+            const nombre = document.getElementById('consultaNombre').value;
+            const objeto = objetos.find(obj => obj.nombre === nombre);
+            if (objeto) {
+                const nuevaDescripcion = prompt("Ingrese la nueva descripción:", objeto.descripcion);
+                if (nuevaDescripcion !== null) {
+                    objeto.descripcion = nuevaDescripcion;
+                    alert("Objeto modificado");
+                    generarInforme();
+                }
+            } else {
+                alert("Objeto no encontrado");
+            }
+        }
+
+        
+        function bajaObjeto() {
+            const nombre = document.getElementById('consultaNombre').value;
+            const index = objetos.findIndex(obj => obj.nombre === nombre);
+            if (index !== -1) {
+                objetos.splice(index, 1);
+                alert("Objeto dado de baja");
+                generarInforme();
+            } else {
+                alert("Objeto no encontrado");
+            }
+        }
+
+       
+        function generarInforme() {
+            const informeLista = document.getElementById('informeLista');
+            informeLista.innerHTML = '';
+            if (objetos.length === 0) {
+                informeLista.innerHTML = '<li class="list-group-item text-center">No hay objetos registrados</li>';
+            } else {
+                objetos.forEach(obj => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = `Nombre: ${obj.nombre}, Descripción: ${obj.descripcion}`;
+                    informeLista.appendChild(li);
+                });
+            }
+            filtrarInforme();  
+        }
+
+       
+        function filtrarInforme() {
+            const filtro = document.getElementById('filtroBusqueda').value.toLowerCase();
+            const items = document.querySelectorAll('#informeLista .list-group-item');
+            items.forEach(item => {
+                const descripcion = item.textContent.toLowerCase();
+                if (descripcion.includes(filtro)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
